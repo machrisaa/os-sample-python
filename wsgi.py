@@ -37,7 +37,7 @@ def apifeed():
     #              create_allergy("Cats", "Loss of limb", "a note", "24/05/2016")]
 
     first_idx = (current_page - 1) * page_size
-    last_idx = first_idx + page_size - 1
+    last_idx = first_idx + page_size
     if last_idx > total - 1: last_idx = total - 1
 
     allergies = []
