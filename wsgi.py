@@ -38,11 +38,11 @@ def apifeed():
 
     first_idx = (current_page - 1) * page_size
     last_idx = first_idx + page_size
-    if last_idx > total - 1: last_idx = total - 1
+    if last_idx > total - 1: last_idx = total
 
     allergies = []
     for i in range(first_idx, last_idx):
-        allergies.append(create_allergy('test, %d' % i, "Sneezes", "a note", "23/05/2016"))
+        allergies.append(create_allergy('test, %d' % i, "Sneezes", "All API parameters: %s" % str(parameters), "23/05/2016"))
 
     v = {
         "Allergies": allergies,
