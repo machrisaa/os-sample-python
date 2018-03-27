@@ -16,13 +16,7 @@ def home():
 
 @application.route("/apifeed", methods=['GET', 'POST'])
 def apifeed():
-    parameters = {}
-    if request.args is not None:
-        parameters.update(request.args.to_dict())
-    if request.json is not None:
-        parameters.update(request.json)
-    if request.form is not None:
-        parameters.update(request.form.to_dict())
+    parameters = get_parameters()
 
     print(parameters)
     # return json.dumps(parameters)
@@ -58,26 +52,28 @@ def apifeed():
 
 @application.route("/echo", methods=['GET', 'POST'])
 def echo():
-    parameters = {}
-    if request.args is not None:
-        parameters.update(request.args.to_dict())
-    if request.json is not None:
-        parameters.update(request.json)
-    if request.form is not None:
-        parameters.update(request.form.to_dict())
+    parameters = get_parameters()
 
     print(parameters)
 
     if len(lastEchoParameters) > 20:
         del lastEchoParameters[0]
-    lastEchoParameters.append([datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
+
+    i = 0
+    if len(lastEchoParameters) > 0:
+        i = lastEchoParameters[-1][0] + 1
+    lastEchoParameters.append([i, datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
 
     return json.dumps(parameters)
 
 
 @application.route("/lastEcho")
 def lastEcho():
-    # return json.dumps(application.lastEchoParameters)
+    pm = get_parameters()
+    count = -1
+    if 'count' in pm:
+        count = int(pm['count'])
+
     content = """
 #Last parameters used by /echo
 ___
@@ -91,14 +87,27 @@ ___
 | ---- | ---------------- | ----------------------- |
 """
         row = ""
-        for i, [dt, parameters] in enumerate(lastEchoParameters):
-            row = ("| %d. | %s | <code>%s</code> |\n" % (i, dt, json.dumps(parameters, indent=4, sort_keys=True).replace("\n", "<br/>").replace(" ", "&nbsp;"))) + row
+        for [i, dt, parameters] in lastEchoParameters:
+            last_i = lastEchoParameters[-1][0]
+            if (count > 0 and last_i + 1 - i <= count) or count < 0:
+                row = ("| %d. | %s | <code>%s</code> |\n" % (i, dt, json.dumps(parameters, indent=4, sort_keys=True).replace("\n", "<br/>").replace(" ", "&nbsp;"))) + row
         content += row
     else:
         content += '\n> no item found\n'
 
     content = Markup(markdown.markdown(content, extensions=['markdown.extensions.tables']))
     return content
+
+
+def get_parameters():
+    parameters = {}
+    if request.args is not None:
+        parameters.update(request.args.to_dict())
+    if request.json is not None:
+        parameters.update(request.json)
+    if request.form is not None:
+        parameters.update(request.form.to_dict())
+    return parameters
 
 
 if __name__ == "__main__":
