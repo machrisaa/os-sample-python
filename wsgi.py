@@ -53,5 +53,30 @@ def apifeed():
     return json.dumps(v)
 
 
+lastEchoParameters = None
+
+
+@application.route("/echo", methods=['GET', 'POST'])
+def echo():
+    parameters = {}
+    if request.args is not None:
+        parameters.update(request.args.to_dict())
+    if request.json is not None:
+        parameters.update(request.json)
+    if request.form is not None:
+        parameters.update(request.form.to_dict())
+
+    print(parameters)
+
+    lastEchoParameters = parameters
+
+    return json.dumps(parameters)
+
+
+@application.route("/lastEcho")
+def lastEcho():
+    return json.dumps(lastEchoParameters)
+
+
 if __name__ == "__main__":
     application.run()
