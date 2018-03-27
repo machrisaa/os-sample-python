@@ -1,7 +1,9 @@
 import os
 
-workers = int(os.environ.get('GUNICORN_PROCESSES', '3'))
-threads = int(os.environ.get('GUNICORN_THREADS', '1'))
+# workers = int(os.environ.get('GUNICORN_PROCESSES', '3'))
+# threads = int(os.environ.get('GUNICORN_THREADS', '1'))
+workers = 1
+threads = 1
 
 preload = True
 
