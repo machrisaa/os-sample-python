@@ -6,6 +6,7 @@ from flask import request
 from flask import Markup
 
 application = Flask(__name__)
+lastEchoParameters = []
 
 
 @application.route("/")
@@ -67,12 +68,9 @@ def echo():
 
     print(parameters)
 
-    if not hasattr(application, 'lastEchoParameters'):
-        application.lastEchoParameters = []
-
-    if len(application.lastEchoParameters) > 20:
-        del application.lastEchoParameters[0]
-    application.lastEchoParameters.append([datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
+    if len(lastEchoParameters) > 20:
+        del lastEchoParameters[0]
+    lastEchoParameters.append([datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
 
     return json.dumps(parameters)
 
@@ -86,13 +84,13 @@ ___
 
 
     """
-    if hasattr(application, 'lastEchoParameters'):
+    if len(lastEchoParameters) > 0:
         content += """
 
 |  ID  | Date             | Parameters              |
 | ---- | ---------------- | ----------------------- |
 """
-        for i, [dt, parameters] in enumerate(application.lastEchoParameters):
+        for i, [dt, parameters] in enumerate(lastEchoParameters):
             content += "| %d. | %s | `%s` |\n" % (i, dt, json.dumps(parameters))
     else:
         content += '\n> no item found\n'
@@ -103,4 +101,3 @@ ___
 
 if __name__ == "__main__":
     application.run()
-    application.lastEchoParameters = []
