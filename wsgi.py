@@ -90,8 +90,10 @@ ___
 |  ID  | Date             | Parameters              |
 | ---- | ---------------- | ----------------------- |
 """
+        row = ""
         for i, [dt, parameters] in enumerate(lastEchoParameters):
-            content += "| %d. | %s | `%s` |\n" % (i, dt, json.dumps(parameters))
+            row = ("| %d. | %s | <code>%s</code> |\n" % (i, dt, json.dumps(parameters, indent=4, sort_keys=True).replace("\n", "<br/>").replace(" ", "&nbsp;"))) + row
+        content += row
     else:
         content += '\n> no item found\n'
 
