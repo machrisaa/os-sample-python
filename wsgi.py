@@ -1,7 +1,9 @@
 import json
-
+from datetime import datetime, timezone
+import markdown
 from flask import Flask
 from flask import request
+from flask import Markup
 
 application = Flask(__name__)
 
@@ -53,9 +55,6 @@ def apifeed():
     return json.dumps(v)
 
 
-lastEchoParameters = None
-
-
 @application.route("/echo", methods=['GET', 'POST'])
 def echo():
     parameters = {}
@@ -68,15 +67,40 @@ def echo():
 
     print(parameters)
 
-    lastEchoParameters = parameters
+    if not hasattr(application, 'lastEchoParameters'):
+        application.lastEchoParameters = []
+
+    if len(application.lastEchoParameters) > 20:
+        del application.lastEchoParameters[0]
+    application.lastEchoParameters.append([datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
 
     return json.dumps(parameters)
 
 
 @application.route("/lastEcho")
 def lastEcho():
-    return json.dumps(lastEchoParameters)
+    # return json.dumps(application.lastEchoParameters)
+    content = """
+#Last parameters used by /echo
+___
+
+
+    """
+    if hasattr(application, 'lastEchoParameters'):
+        content += """
+
+|  ID  | Date             | Parameters              |
+| ---- | ---------------- | ----------------------- |
+"""
+        for i, [dt, parameters] in enumerate(application.lastEchoParameters):
+            content += "| %d. | %s | `%s` |\n" % (i, dt, json.dumps(parameters))
+    else:
+        content += '\n> no item found\n'
+
+    content = Markup(markdown.markdown(content, extensions=['markdown.extensions.tables']))
+    return content
 
 
 if __name__ == "__main__":
     application.run()
+    application.lastEchoParameters = []
