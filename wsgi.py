@@ -24,9 +24,17 @@ def apifeed():
     page_size = int(parameters['PageSize'])
     current_page = int(parameters['CurrentPage'])
     total = int(parameters['DemoSize'])
+    include_nested = parameters.get('IncludeNested') == "1"
 
-    def create_allergy(name, result, note, date_recorded):
-        return {"Allergen": name, "AllergyResult": result, "Note": note, "DateRecorded": date_recorded}
+    def create_allergy(index, name, result, note, date_recorded):
+        value = {"Allergen": name, "AllergyResult": result, "Note": note, "DateRecorded": date_recorded}
+        if include_nested:
+            nested_collection = []
+            for j in range(index + 1):
+                nested_collection.append({"Lv2Index": j, "Lv2Text": "test, (%d, %d)" % (i, j)})
+            value["NestedCollection"] = nested_collection
+
+        return value
 
     # allergies = [create_allergy("Pollen", "Sneezes", "a note", "23/05/2016"),
     #              create_allergy("Penicillin", "Death", "a note", "21/05/2016"),
@@ -39,7 +47,7 @@ def apifeed():
 
     allergies = []
     for i in range(first_idx, last_idx):
-        allergies.append(create_allergy('test, %d' % i, "Sneezes", "All API parameters: %s" % str(parameters), "23/05/2016"))
+        allergies.append(create_allergy(i, 'test, %d' % i, "Sneezes", "All API parameters: %s" % str(parameters), "23/05/2016"))
 
     v = {
         "Allergies": allergies,
