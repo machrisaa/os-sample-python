@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 import markdown
 from flask import Flask
 from flask import request
@@ -70,7 +70,7 @@ def echo():
     i = 0
     if len(lastEchoParameters) > 0:
         i = lastEchoParameters[-1][0] + 1
-    lastEchoParameters.append([i, datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
+    lastEchoParameters.append([i, datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), parameters])
 
     return json.dumps(parameters)
 
