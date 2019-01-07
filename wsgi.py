@@ -29,7 +29,15 @@ def apifeed():
     include_nested = parameters.get('IncludeNested') == "1"
 
     def create_allergy(index, name, result, note, date_recorded):
-        value = {"Allergen": name, "AllergyResult": result, "Note": note, "DateRecorded": date_recorded}
+        value = {
+            "Allergen": name,
+            "AllergyResult": result,
+            "Note": note,
+            "DateRecorded": date_recorded,
+            "$DocumentId": "hubdatas/57bde835-777b-4347-b602-0831645c1e31",
+            "$SchemaId": "hubschemas/sws/ctad-1686-eform-test"
+        }
+
         if include_nested:
             nested_collection = []
             for j in range(index + 1):
@@ -55,9 +63,7 @@ def apifeed():
         "Allergies": allergies,
         "RecordSetPageSize": page_size,
         "RecordSetCurrentPage": current_page,
-        "RecordSetTotalResults": total,
-        "$DocumentId": "hubdatas/57bde835-777b-4347-b602-0831645c1e31",
-        "$SchemaId": "hubschemas/sws/ctad-1686-eform-test"
+        "RecordSetTotalResults": total
     }
     return json.dumps(v)
 
