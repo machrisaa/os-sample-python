@@ -55,7 +55,9 @@ def apifeed():
         "Allergies": allergies,
         "RecordSetPageSize": page_size,
         "RecordSetCurrentPage": current_page,
-        "RecordSetTotalResults": total
+        "RecordSetTotalResults": total,
+        "$DocumentId": "hubdatas/57bde835-777b-4347-b602-0831645c1e31",
+        "$SchemaId": "hubschemas/sws/ctad-1686-eform-test"
     }
     return json.dumps(v)
 
